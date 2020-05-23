@@ -31,6 +31,8 @@ function main() {
     if (drawing) {
       let position = getCanvasPositionByEvent(evnt);
       ctx.strokeStyle = lineColor;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       ctx.lineWidth = calculateActualLineWidth();
       ctx.beginPath();
       ctx.moveTo(lastPosition.x, lastPosition.y);
@@ -90,6 +92,8 @@ function redraw() {
     let toPosition = makeAbsolutePosition(evnt.to);
     ctx.strokeStyle = evnt.color;
     ctx.lineWidth = calculateActualLineWidth(evnt.width);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.beginPath();
     ctx.moveTo(fromPosition.x, fromPosition.y);
     ctx.lineTo(toPosition.x, toPosition.y);
@@ -102,6 +106,8 @@ function initializeCanvas() {
   document.body.style.padding = `${paddingPercent}vh ${paddingPercent}vw`;
   ctx = canvas.getContext('2d');
   ctx.lineWidth = calculateActualLineWidth();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 }
 
 function setupControls() {
