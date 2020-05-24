@@ -2,10 +2,15 @@ body {
   text-align: center;
 }
 
+button {
+  font-weight: bold;
+}
+
 canvas {
   border: 1px solid black;
   margin-left: auto;
   margin-right: auto;
+  touch-action: none;
 }
 
 #controls-container {
@@ -26,7 +31,7 @@ canvas {
   justify-content: center;
   align-items: center;
   padding: 10px;
-  /* background-color: lightblue; */
+  background-color: white;
   border: 2px solid black;
 }
 

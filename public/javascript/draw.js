@@ -25,8 +25,7 @@ function attachEventListeners() {
 
   window.addEventListener('mouseup', stopDrawing);
   window.addEventListener('touchend', stopDrawing);
-  window.addEventListener('touchleave', stopDrawing);
-  window.addEventListener('touchleave', stopDrawing);
+  window.addEventListener('touchcancel', stopDrawing);
 
   canvas.addEventListener('mousemove', draw);
   canvas.addEventListener('touchmove', draw);
@@ -63,6 +62,7 @@ function draw(evnt) {
     });
     lastPosition = position;
   }
+  evnt.preventDefault();
 }
 
 function makeRelativePosition(position) {
@@ -162,7 +162,6 @@ function setupColorControls() {
     innerEl.style.width = '100%';
     innerEl.style.height = '100%';
     innerEl.style.backgroundColor = color;
-    // innerEl.style.border = '1px solid gray';
     el.addEventListener('click', (evnt) => {
       deactivateToggles('.color-control');
       el.classList.toggle('active');
