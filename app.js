@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -16,9 +18,13 @@ nunjucks.configure('./views', {
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+
+let cookiePassword = crypto.createHash('sha512').update(crypto.randomBytes(30)).digest().toString('hex');
+app.use(cookieParser(cookiePassword));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+
+app.locals.drawings = {};
 
 module.exports = app;

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Canvas Redraw</title>
+  <link rel="stylesheet" href="/stylesheets/skeleton.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css">
+  <script>
+    var key = '{{ key }}';
+  </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/javascript/draw.js"></script>
+</head>
+
+<body>
+  <div id="canvas-container">
+    <canvas id="syncboard" width="800" height="450"></canvas>
+  </div>
+  <div id="controls-container">
+    <div id="controls">
+      <div id="color-controls">
+        <div class="color-control active" data-color="#025bd1"></div>
+        <div class="color-control" data-color="#d10202"></div>
+        <div class="color-control" data-color="#06a001"></div>
+        <div class="color-control" data-color="#383838"></div>
+        <div class="color-control" data-color="#f9ef20"></div>
+        <div class="color-control" data-color="#f98220"></div>
+        <div class="color-control" data-color="#ffffff"></div>
+      </div>
+      <div id="size-controls">
+        <div class="size-control active" data-size="1"></div>
+        <div class="size-control" data-size="2"></div>
+        <div class="size-control" data-size="3"></div>
+        <div class="size-control" data-size="4"></div>
+        <div class="size-control" data-size="5"></div>
+      </div>
+      <div id="canvas-controls">
+        <div class="canvas-control">
+          <button id="clear-button" class="button-primary">CLEAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

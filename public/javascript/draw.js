@@ -1,3 +1,4 @@
+let socket = io();
 let canvas = null;
 let ctx = null;
 let drawing = false;
@@ -12,6 +13,10 @@ function main() {
   resetCanvasSize();
   setupControls();
   attachEventListeners();
+
+  socket.on('drawEvent', function(drawData) {
+    console.log(drawData);
+  });
 }
 
 function attachEventListeners() {
@@ -54,12 +59,14 @@ function draw(evnt) {
     let lastPositionRelative = makeRelativePosition(lastPosition);
     let currentPositionRelative = makeRelativePosition(position);
 
-    events.push({
+    let drawEvent = {
       from: lastPositionRelative,
       to: currentPositionRelative,
       width: lineWidth,
       color: lineColor,
-    });
+    };
+    events.push(drawEvent);
+    socket.emit('drawEvent', drawEvent);
     lastPosition = position;
   }
   evnt.preventDefault();
