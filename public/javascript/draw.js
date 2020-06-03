@@ -1,4 +1,3 @@
-let socket = io();
 let canvas = null;
 let ctx = null;
 let drawing = false;
@@ -7,6 +6,7 @@ let lineWidth = 1;
 let lineColor = '#025bd1';
 let events = [];
 const paddingPercent = 5;
+const socket = new WebSocket('ws://localhost:3000/socket/draw');
 
 function main() {
   initializeCanvas();
@@ -14,9 +14,9 @@ function main() {
   setupControls();
   attachEventListeners();
 
-  socket.on('drawEvent', function(drawData) {
-    console.log(drawData);
-  });
+  // socket.on('drawEvent', function(drawData) {
+  //   console.log(drawData);
+  // });
 }
 
 function attachEventListeners() {
@@ -66,7 +66,7 @@ function draw(evnt) {
       color: lineColor,
     };
     events.push(drawEvent);
-    socket.emit('drawEvent', drawEvent);
+    socket.send(JSON.stringify(drawEvent));
     lastPosition = position;
   }
   evnt.preventDefault();

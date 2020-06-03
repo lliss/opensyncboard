@@ -23,15 +23,12 @@ router.get('/new', function(req, res, next) {
 router.get('/draw/:id', function(req, res, next) {
   let id = req.params.id;
   let key = req.signedCookies.key || null;
-  if (!key) {
-    res.redirect(`/new`, 303);
-    next();
-    return;
-  } else if (req.app.locals.drawings[id] !== key) {
-    res.redirect(`/new`, 303);
+  if (!key || req.app.locals.drawings[id] !== key) {
+    res.redirect(303, '/new');
     next();
     return;
   }
+
   console.log(req.app.locals.drawings);
   res.render('draw.html', { key });
   next();
