@@ -1,10 +1,63 @@
 body {
-  padding: 50px 5%;
   text-align: center;
+}
+
+button {
+  font-weight: bold;
 }
 
 canvas {
   border: 1px solid black;
   margin-left: auto;
   margin-right: auto;
+  touch-action: none;
+}
+
+#controls-container {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+}
+
+#controls {
+  display: flex;
+  justify-content: center;
+  height: 80px;
+}
+
+#color-controls, #size-controls, #canvas-controls {
+  border: 1px solid red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: white;
+  border: 2px solid black;
+}
+
+#color-controls {
+  border-radius: 10px 0 0 10px;
+  border-right: 0px solid black;
+}
+
+#canvas-controls {
+  border-radius: 0 10px 10px 0;
+  border-left: 0px solid black;
+}
+
+.color-control, .size-control {
+  width: 40px;
+  height: 40px;
+  border: 1px solid gray;
+  background-color: white;
+  padding: 5px;
+  margin: 5px;
+}
+
+.canvas-control {
+  height: 40px;
+}
+
+.color-control.active, .size-control.active {
+  background-color: silver;
 }
