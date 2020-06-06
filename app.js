@@ -7,47 +7,59 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const nunjucks = require('nunjucks');
 
-const indexRouter = require('./routes/index');
-const socketRouter = require('./routes/sockets');
+const constants = require('./constants');
+const indexRouter = require('./routes');
+const prepareSockets = require('./sockets');
 const serverFunctions = require('./helpers/serverFunctions');
 
 const app = express();
-
-const port = serverFunctions.normalizePort(process.env.PORT || '3000');
-const address = process.env.ADDR || '127.0.0.1';
-
-app.set('port', port);
-
 const server = http.createServer(app);
-require('express-ws')(app, server);
 
-server.listen(port, address);
+const port = serverFunctions.normalizePort(process.env.PORT || constants.DEFAULT_PORT);
+const address = process.env.ADDR || '127.0.0.1';
+const drawingsMap = new Map();
+const socketServers = prepareSockets(drawingsMap);
 
-server.on('error', (error) => {
-  serverFunctions.onError(error, port);
-});
+const cookiePassword = crypto.createHash('sha512').update(crypto.randomBytes(30)).digest().toString('hex');
+const cp = cookieParser(cookiePassword)
 
-server.on('listening', () => {
-  const addr = server.address();
-  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  console.log(`Listening on ${addr.address} ${bind}`);
-});
+function setupExpress() {
+  app.set('port', port);
+  app.use(logger('dev'));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
 
-nunjucks.configure('./views', {
-  autoescape: true,
-  express: app
-});
+  app.use(cp);
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+  app.use(express.static(path.join(__dirname, 'public')));
 
-let cookiePassword = crypto.createHash('sha512').update(crypto.randomBytes(30)).digest().toString('hex');
-app.use(cookieParser(cookiePassword));
+  app.use('/', indexRouter(drawingsMap));
+}
 
-app.use(express.static(path.join(__dirname, 'public')));
+function setupServer() {
+  server.listen(port, address);
 
-app.use('/', indexRouter);
-app.use('/socket', socketRouter(express));
+  server.on('error', (error) => {
+    serverFunctions.onError(error, port);
+  });
 
-app.locals.drawings = {};
+  server.on('listening', () => {
+    const addr = server.address();
+    const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+    console.log(`Listening on ${addr.address} ${bind}`);
+  });
+
+  server.on('upgrade', serverFunctions.prepareUpgrade(socketServers, drawingsMap, cp));
+}
+
+function main() {
+  setupExpress();
+  setupServer();
+
+  nunjucks.configure('./views', {
+    autoescape: true,
+    express: app
+  });
+}
+
+main();

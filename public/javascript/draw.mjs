@@ -6,7 +6,7 @@ let lineWidth = 1;
 let lineColor = '#025bd1';
 let events = [];
 const paddingPercent = 5;
-const socket = new WebSocket('ws://localhost:3000/socket/draw');
+const socket = new WebSocket(`ws://localhost:3000/socket/draw/${drawingId}`);
 
 function main() {
   initializeCanvas();

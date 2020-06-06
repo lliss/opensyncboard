@@ -23,7 +23,6 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "express": "~4.16.1",
-    "express-ws": "^4.0.0",
     "morgan": "~1.9.1",
     "nunjucks": "^3.2.1",
     "uuid": "^8.1.0",
