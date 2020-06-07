@@ -1,0 +1,17 @@
+const DEFAULT_LINE_COLOR = '#025bd1';
+const DEFAULT_LINE_WIDTH = 1;
+const PADDING_PERCENT = 5;
+const RATIO_HEIGHT = 9;
+const RATIO_WIDTH = 16;
+const SOCKET_DRAW_BASE_URL = `ws://localhost:3000/socket/draw`;
+const SOCKET_VIEW_BASE_URL = `ws://localhost:3000/socket/view/`;
+
+export default {
+  DEFAULT_LINE_COLOR,
+  DEFAULT_LINE_WIDTH,
+  PADDING_PERCENT,
+  RATIO_HEIGHT,
+  RATIO_WIDTH,
+  SOCKET_DRAW_BASE_URL,
+  SOCKET_VIEW_BASE_URL,
+};

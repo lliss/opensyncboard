@@ -10,7 +10,6 @@ module.exports = (map) => {
 
   drawWss.on('connection', function connection(ws) {
     ws.on('message', function(msg) {
-      console.log('draw', msg, ws.drawingId);
       map.get(ws.drawingId).consumers.forEach((consumerWs) => {
         if (consumerWs.readyState === WebSocket.OPEN) {
           consumerWs.send(msg);
@@ -21,7 +20,7 @@ module.exports = (map) => {
 
   watchWss.on('connection', function connection(ws) {
     ws.on('message', function(msg) {
-      console.log(msg);
+      // show connection to drawer.
     });
   });
 

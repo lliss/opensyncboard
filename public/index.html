@@ -12,6 +12,20 @@
   <a href="/new" class="button button-primary">Start New</a>
   <p>or...</p>
   <input type="text" id="code" placeholder="syncboard code"> <button class=button-primary id="join">Join</button>
+  <script>
+    document.querySelector('#join').addEventListener('click', () => {
+      const validChars = 'abcdef0123456789'.split('');
+      let code = document.querySelector('#code').value;
+
+      code = code.toLowerCase();
+      let valid = code.split('').map(item => validChars.includes(item)).reduce((result, item) => result && item)
+      if (code.length === 10 && valid) {
+        window.location = `/view/${code}`;
+      } else {
+        // invalid code message.
+      }
+    });
+  </script>
 </body>
 
 </html>

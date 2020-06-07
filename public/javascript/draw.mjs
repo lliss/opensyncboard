@@ -1,27 +1,27 @@
+import constants from './constants.mjs';
+import * as drawHelpers from './drawHelpers.mjs';
+
 let canvas = null;
 let ctx = null;
 let drawing = false;
 let lastPosition = { x: null, y: null };
-let lineWidth = 1;
-let lineColor = '#025bd1';
+let lineWidth = constants.DEFAULT_LINE_WIDTH;
+let lineColor = constants.DEFAULT_LINE_COLOR;
 let events = [];
-const paddingPercent = 5;
-const socket = new WebSocket(`ws://localhost:3000/socket/draw/${drawingId}`);
+const socket = new WebSocket(`${constants.SOCKET_DRAW_BASE_URL}/${drawingId}`);
 
 function main() {
-  initializeCanvas();
-  resetCanvasSize();
-  setupControls();
-  attachEventListeners();
-
-  // socket.on('drawEvent', function(drawData) {
-  //   console.log(drawData);
-  // });
+  socket.addEventListener('open', () => {
+    initializeCanvas();
+    drawHelpers.resetCanvasSize(canvas);
+    setupControls();
+    attachEventListeners();
+  });
 }
 
 function attachEventListeners() {
   window.addEventListener('resize', (evnt) => {
-    resetCanvasSize();
+    drawHelpers.resetCanvasSize(canvas);
     redraw();
   });
 
@@ -51,13 +51,13 @@ function draw(evnt) {
     ctx.strokeStyle = lineColor;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = calculateActualLineWidth();
+    ctx.lineWidth = drawHelpers.calculateActualLineWidth(lineWidth, canvas);
     ctx.beginPath();
     ctx.moveTo(lastPosition.x, lastPosition.y);
     ctx.lineTo(position.x, position.y);
     ctx.stroke();
-    let lastPositionRelative = makeRelativePosition(lastPosition);
-    let currentPositionRelative = makeRelativePosition(position);
+    let lastPositionRelative = drawHelpers.makeRelativePosition(lastPosition, canvas);
+    let currentPositionRelative = drawHelpers.makeRelativePosition(position, canvas);
 
     let drawEvent = {
       from: lastPositionRelative,
@@ -72,20 +72,6 @@ function draw(evnt) {
   evnt.preventDefault();
 }
 
-function makeRelativePosition(position) {
-  return {
-    x: position.x / canvas.width,
-    y: position.y / canvas.height,
-  };
-}
-
-function makeAbsolutePosition(position) {
-  return {
-    x: Math.floor(position.x * canvas.width),
-    y: Math.floor(position.y * canvas.height),
-  };
-}
-
 function getCanvasPositionByEvent(evnt) {
   return {
     x: evnt.pageX - evnt.target.offsetLeft,
@@ -93,24 +79,12 @@ function getCanvasPositionByEvent(evnt) {
   };
 }
 
-function resetCanvasSize() {
-  let width = Math.floor(window.innerWidth * (1 - paddingPercent * 2 / 100));
-  canvas.width = width;
-  canvas.height = Math.floor(width * 9 / 16);
-
-  if (window.innerHeight < document.body.scrollHeight) {
-    let height = Math.floor(window.innerHeight * (1 - paddingPercent * 2 / 100));
-    canvas.height = height;
-    canvas.width = Math.floor(height * 16 / 9);
-  }
-}
-
 function redraw() {
   events.forEach((evnt) => {
-    let fromPosition = makeAbsolutePosition(evnt.from);
-    let toPosition = makeAbsolutePosition(evnt.to);
+    let fromPosition = drawHelpers.makeAbsolutePosition(evnt.from, canvas);
+    let toPosition = drawHelpers.makeAbsolutePosition(evnt.to, canvas);
     ctx.strokeStyle = evnt.color;
-    ctx.lineWidth = calculateActualLineWidth(evnt.width);
+    ctx.lineWidth = drawHelpers.calculateActualLineWidth(evnt.width, canvas);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
@@ -122,9 +96,9 @@ function redraw() {
 
 function initializeCanvas() {
   canvas = document.querySelector('#syncboard');
-  document.body.style.padding = `${paddingPercent}vh ${paddingPercent}vw`;
+  document.body.style.padding = `${constants.PADDING_PERCENT}vh ${constants.PADDING_PERCENT}vw`;
   ctx = canvas.getContext('2d');
-  ctx.lineWidth = calculateActualLineWidth();
+  ctx.lineWidth = drawHelpers.calculateActualLineWidth(constants.DEFAULT_LINE_WIDTH, canvas);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 }
@@ -181,10 +155,6 @@ function deactivateToggles(selector) {
   document.querySelectorAll(selector).forEach((el) => {
     el.classList.remove('active');
   });
-}
-
-function calculateActualLineWidth(width = lineWidth) {
-  return Math.max(Math.floor(width / 200 * canvas.width), 1)
 }
 
 main();
