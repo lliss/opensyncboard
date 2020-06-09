@@ -9,19 +9,27 @@ module.exports = (map) => {
   watchWss.type = 'consumer';
 
   drawWss.on('connection', function connection(ws) {
-    ws.on('message', function(msg) {
-      map.get(ws.drawingId).consumers.forEach((consumerWs) => {
-        if (consumerWs.readyState === WebSocket.OPEN) {
-          consumerWs.send(msg);
-        }
-      });
+    const drawingChannel = map.get(ws.drawingId);
+
+    ws.on('close', () => {
+      map.get(ws.drawingId).clearEvents();
+      drawingChannel.sendMessageObjectToConsumers({ type: 'clear' });
+    });
+
+    ws.on('message', (msg) => {
+      const msgObject = JSON.parse(msg);
+      drawingChannel.addEvent(msgObject);
+      drawingChannel.sendMessageObjectToConsumers(msgObject);
     });
   });
 
-  watchWss.on('connection', function connection(ws) {
-    ws.on('message', function(msg) {
-      // show connection to drawer.
-    });
+  watchWss.on('connection', (ws) => {
+    // TODO show connection to drawer.
+    // TODO show message to watcher.
+    ws.send(JSON.stringify({
+      type: 'sync',
+      events: map.get(ws.drawingId).getEvents()
+    }));
   });
 
   let socketServers = {};

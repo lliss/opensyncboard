@@ -7,7 +7,7 @@ let events = [];
 const socket = new WebSocket(`${constants.SOCKET_VIEW_BASE_URL}/${drawingId}`);
 
 function main() {
-  initializeCanvas();
+  ({ctx, canvas} = drawHelpers.initializeCanvas());
   drawHelpers.resetCanvasSize(canvas);
   attachEventListeners();
 
@@ -24,53 +24,52 @@ function main() {
   });
 
   socket.addEventListener('message', function (evnt) {
+    let drawEvent = null;
     try {
-      let drawEvent = JSON.parse(evnt.data);
-      events.push(drawEvent);
-      let fromPosition = drawHelpers.makeAbsolutePosition(drawEvent.from, canvas);
-      let toPosition = drawHelpers.makeAbsolutePosition(drawEvent.to, canvas);
-      ctx.strokeStyle = drawEvent.color;
-      ctx.lineWidth = drawHelpers.calculateActualLineWidth(drawEvent.width, canvas);
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      ctx.moveTo(fromPosition.x, fromPosition.y);
-      ctx.lineTo(toPosition.x, toPosition.y);
-      ctx.stroke();
+      drawEvent = JSON.parse(evnt.data);
     } catch (e) {
-      console.error(`Bad JSON data: ${evnt.data}`);
+      console.error(`Error: ${e.message}`);
+      console.error(`Data: ${evnt.data}`);
+    }
+    if (drawEvent) {
+      handleIncomingDrawEvent(drawEvent);
     }
   });
+}
+
+function handleIncomingDrawEvent(drawEvent) {
+  switch (drawEvent.type) {
+    case constants.DRAW_EVENT_TYPE_SYNC:
+      events = drawEvent.events;
+      drawHelpers.redraw(events, ctx, canvas);
+      break;
+
+    case constants.DRAW_EVENT_TYPE_SEGMENT:
+      drawHelpers.drawSegment(drawEvent.event, ctx, canvas);
+      events.push(drawEvent);
+      break;
+
+    case constants.DRAW_EVENT_TYPE_CIRCLE:
+      drawHelpers.drawCircle(drawEvent.event, ctx, canvas);
+      events.push(drawEvent);
+      break;
+
+    case constants.DRAW_EVENT_TYPE_CLEAR:
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      events = [];
+      drawHelpers.redraw(events, ctx, canvas);
+      break;
+
+    default:
+      // Noop
+  }
 }
 
 function attachEventListeners() {
   window.addEventListener('resize', (evnt) => {
     drawHelpers.resetCanvasSize(canvas);
-    redraw();
+    drawHelpers.redraw(events, ctx, canvas);
   });
-}
-
-function redraw() {
-  events.forEach((evnt) => {
-    let fromPosition = drawHelpers.makeAbsolutePosition(evnt.from, canvas);
-    let toPosition = drawHelpers.makeAbsolutePosition(evnt.to, canvas);
-    ctx.strokeStyle = evnt.color;
-    ctx.lineWidth = drawHelpers.calculateActualLineWidth(evnt.width, canvas);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(fromPosition.x, fromPosition.y);
-    ctx.lineTo(toPosition.x, toPosition.y);
-    ctx.stroke();
-  });
-}
-
-function initializeCanvas() {
-  canvas = document.querySelector('#syncboard');
-  document.body.style.padding = `${constants.PADDING_PERCENT}vh ${constants.PADDING_PERCENT}vw`;
-  ctx = canvas.getContext('2d');
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
 }
 
 main();

@@ -12,7 +12,7 @@ const socket = new WebSocket(`${constants.SOCKET_DRAW_BASE_URL}/${drawingId}`);
 
 function main() {
   socket.addEventListener('open', () => {
-    initializeCanvas();
+    ({ctx, canvas} = drawHelpers.initializeCanvas());
     drawHelpers.resetCanvasSize(canvas);
     setupControls();
     attachEventListeners();
@@ -22,7 +22,7 @@ function main() {
 function attachEventListeners() {
   window.addEventListener('resize', (evnt) => {
     drawHelpers.resetCanvasSize(canvas);
-    redraw();
+    drawHelpers.redraw(events, ctx, canvas);
   });
 
   canvas.addEventListener('mousedown', startDrawing);
@@ -34,6 +34,8 @@ function attachEventListeners() {
 
   canvas.addEventListener('mousemove', draw);
   canvas.addEventListener('touchmove', draw);
+
+  canvas.addEventListener('click', addCircle);
 }
 
 function startDrawing(evnt) {
@@ -48,23 +50,20 @@ function stopDrawing() {
 function draw(evnt) {
   if (drawing) {
     let position = getCanvasPositionByEvent(evnt);
-    ctx.strokeStyle = lineColor;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = drawHelpers.calculateActualLineWidth(lineWidth, canvas);
-    ctx.beginPath();
-    ctx.moveTo(lastPosition.x, lastPosition.y);
-    ctx.lineTo(position.x, position.y);
-    ctx.stroke();
     let lastPositionRelative = drawHelpers.makeRelativePosition(lastPosition, canvas);
     let currentPositionRelative = drawHelpers.makeRelativePosition(position, canvas);
 
     let drawEvent = {
-      from: lastPositionRelative,
-      to: currentPositionRelative,
-      width: lineWidth,
-      color: lineColor,
+      type: constants.DRAW_EVENT_TYPE_SEGMENT,
+      event: {
+        from: lastPositionRelative,
+        to: currentPositionRelative,
+        width: lineWidth,
+        color: lineColor,
+      }
     };
+
+    drawHelpers.drawSegment(drawEvent.event, ctx, canvas);
     events.push(drawEvent);
     socket.send(JSON.stringify(drawEvent));
     lastPosition = position;
@@ -72,35 +71,29 @@ function draw(evnt) {
   evnt.preventDefault();
 }
 
+function addCircle(evnt) {
+  let position = getCanvasPositionByEvent(evnt);
+  let relativeCenter = drawHelpers.makeRelativePosition(position, canvas);
+
+  let drawEvent = {
+    type: constants.DRAW_EVENT_TYPE_CIRCLE,
+    event: {
+      center: relativeCenter,
+      diameter: lineWidth,
+      color: lineColor,
+    }
+  };
+
+  drawHelpers.drawCircle(drawEvent.event, ctx, canvas);
+  events.push(drawEvent);
+  socket.send(JSON.stringify(drawEvent));
+}
+
 function getCanvasPositionByEvent(evnt) {
   return {
     x: evnt.pageX - evnt.target.offsetLeft,
     y: evnt.pageY - evnt.target.offsetTop
   };
-}
-
-function redraw() {
-  events.forEach((evnt) => {
-    let fromPosition = drawHelpers.makeAbsolutePosition(evnt.from, canvas);
-    let toPosition = drawHelpers.makeAbsolutePosition(evnt.to, canvas);
-    ctx.strokeStyle = evnt.color;
-    ctx.lineWidth = drawHelpers.calculateActualLineWidth(evnt.width, canvas);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(fromPosition.x, fromPosition.y);
-    ctx.lineTo(toPosition.x, toPosition.y);
-    ctx.stroke();
-  });
-}
-
-function initializeCanvas() {
-  canvas = document.querySelector('#syncboard');
-  document.body.style.padding = `${constants.PADDING_PERCENT}vh ${constants.PADDING_PERCENT}vw`;
-  ctx = canvas.getContext('2d');
-  ctx.lineWidth = drawHelpers.calculateActualLineWidth(constants.DEFAULT_LINE_WIDTH, canvas);
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
 }
 
 function setupControls() {
@@ -123,7 +116,7 @@ function setupSizeControls() {
     el.addEventListener('click', (evnt) => {
       deactivateToggles('.size-control');
       el.classList.toggle('active');
-      lineWidth = el.dataset.size;
+      lineWidth = Number(el.dataset.size);
     });
   });
 }
@@ -132,6 +125,7 @@ function setupCanvasControls() {
   document.querySelector('#clear-button').addEventListener('click', (evnt) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     events = [];
+    socket.send(JSON.stringify({ type: constants.DRAW_EVENT_TYPE_CLEAR }));
   });
 }
 

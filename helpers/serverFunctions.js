@@ -81,6 +81,7 @@ function upgradeConnectionIfAllowed(wss, map, connectionData) {
     });
   } else if (wss.type === 'consumer') {
     wss.handleUpgrade(connectionData.req, connectionData.socket, connectionData.head, function done(ws) {
+      ws.drawingId = connectionData.id;
       map.get(connectionData.id).addConsumer(ws);
       wss.emit('connection', ws, connectionData.req);
     });

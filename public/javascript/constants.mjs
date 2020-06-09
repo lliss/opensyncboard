@@ -1,6 +1,10 @@
 const DEFAULT_LINE_COLOR = '#025bd1';
 const DEFAULT_LINE_WIDTH = 1;
 const PADDING_PERCENT = 5;
+const DRAW_EVENT_TYPE_CIRCLE = 'circle';
+const DRAW_EVENT_TYPE_CLEAR = 'clear';
+const DRAW_EVENT_TYPE_SEGMENT = 'segment';
+const DRAW_EVENT_TYPE_SYNC = 'sync';
 const RATIO_HEIGHT = 9;
 const RATIO_WIDTH = 16;
 const SOCKET_DRAW_BASE_URL = `ws://localhost:3000/socket/draw`;
@@ -9,6 +13,10 @@ const SOCKET_VIEW_BASE_URL = `ws://localhost:3000/socket/view/`;
 export default {
   DEFAULT_LINE_COLOR,
   DEFAULT_LINE_WIDTH,
+  DRAW_EVENT_TYPE_CIRCLE,
+  DRAW_EVENT_TYPE_CLEAR,
+  DRAW_EVENT_TYPE_SEGMENT,
+  DRAW_EVENT_TYPE_SYNC,
   PADDING_PERCENT,
   RATIO_HEIGHT,
   RATIO_WIDTH,
