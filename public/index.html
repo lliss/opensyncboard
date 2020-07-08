@@ -16,7 +16,7 @@
   <script>
     document.querySelector('#join').addEventListener('click', () => {
       const validChars = 'abcdef0123456789'.split('');
-      const code = document.querySelector('#code').value.toLowerCase;
+      const code = document.querySelector('#code').value.toLowerCase();
 
       let valid = code.split('')
         .map(item => validChars.includes(item))
