@@ -13,12 +13,24 @@ const socket = new WebSocket(`${constants.SOCKET_DRAW_BASE_URL}/${drawingId}`);
 
 function main() {
   document.body.style.padding = `${constants.PADDING_PERCENT}vh ${constants.PADDING_PERCENT}vw`;
+
   socket.addEventListener('open', () => {
     surface = new DrawingSurface('#syncboard', '2d');
     surface.resetCanvasSize();
     setupControls();
     attachEventListeners();
   });
+
+  socket.addEventListener('message', function (evnt) {
+    try {
+      let count = JSON.parse(evnt.data).count;
+      document.querySelector('#active-clients p').textContent = `${count} connected clients`;
+    } catch (e) {
+      console.error(`Error: ${e.message}`);
+      console.error(`Data: ${evnt.data}`);
+    }
+  });
+
 }
 
 function attachEventListeners() {

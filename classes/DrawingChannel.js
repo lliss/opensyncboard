@@ -29,6 +29,10 @@ class DrawingChannel {
     return this.events;
   }
 
+  getProducer() {
+    return this.producer;
+  }
+
   getConsumers() {
     return this.consumers;
   }
@@ -43,6 +47,13 @@ class DrawingChannel {
         consumerWs.send(JSON.stringify(msgObject));
       }
     });
+  }
+
+  alertProducerOfActiveConsumers() {
+    let count = this.getConsumers()
+                  .filter(consumerWs => consumerWs.readyState === WebSocket.OPEN)
+                  .length;
+    this.getProducer().send(JSON.stringify({ count }));
   }
 
 }

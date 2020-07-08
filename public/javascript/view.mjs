@@ -4,6 +4,7 @@ import * as drawHelpers from './drawHelpers.mjs';
 
 let surface = null;
 let events = [];
+let statusChangeTimer = null;
 const socket = new WebSocket(`${constants.SOCKET_VIEW_BASE_URL}/${drawingId}`);
 
 function main() {
@@ -24,23 +25,23 @@ function main() {
   });
 
   socket.addEventListener('message', function (evnt) {
-    let drawEvent = null;
+    let eventData = null;
     try {
-      drawEvent = JSON.parse(evnt.data);
+      eventData = JSON.parse(evnt.data);
     } catch (e) {
       console.error(`Error: ${e.message}`);
       console.error(`Data: ${evnt.data}`);
     }
-    if (drawEvent) {
-      handleIncomingDrawEvent(drawEvent);
+    if (eventData) {
+      handleIncomingEvent(eventData);
     }
   });
 }
 
-function handleIncomingDrawEvent(drawEvent) {
-  switch (drawEvent.type) {
+function handleIncomingEvent(eventData) {
+  switch (eventData.type) {
     case constants.DRAW_EVENT_TYPE_SYNC:
-      events = drawEvent.events;
+      events = eventData.events;
       drawHelpers.redraw(events, surface);
       break;
 
@@ -49,9 +50,30 @@ function handleIncomingDrawEvent(drawEvent) {
       events = [];
       break;
 
+    case constants.PRODUCER_EVENT_STATUS_CHANGE:
+      updateSessionConnectionMessage(eventData);
+      break;
+
     default:
-      drawHelpers.routeDrawEvent(drawEvent, surface);
-      events.push(drawEvent);
+      drawHelpers.routeDrawEvent(eventData, surface);
+      events.push(eventData);
+  }
+}
+
+function updateSessionConnectionMessage(sessionStatusMessage) {
+  if (sessionStatusMessage.status === 'closed') {
+    statusChangeTimer = setTimeout(() => {
+      let el = document.querySelector('#session-status p');
+      el.textContent = 'inactive connection';
+      el.classList.add('inactive');
+      el.classList.remove('active');
+      }, 3000)
+  } else {
+    clearTimeout(statusChangeTimer);
+    let el = document.querySelector('#session-status p');
+    el.textContent = 'active connection';
+    el.classList.add('active');
+    el.classList.remove('inactive');
   }
 }
 

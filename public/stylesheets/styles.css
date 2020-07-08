@@ -6,6 +6,24 @@ button {
   font-weight: bold;
 }
 
+#active-clients, #session-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: black;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 1s ease;
+}
+
+#session-status .inactive {
+  color: red;
+}
+
+#session-status .active {
+  color: green;
+}
+
 canvas {
   border: 1px solid black;
   margin-left: auto;

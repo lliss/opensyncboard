@@ -10,10 +10,19 @@ module.exports = (map) => {
 
   drawWss.on('connection', function connection(ws) {
     const drawingChannel = map.get(ws.drawingId);
+    map.get(ws.drawingId).alertProducerOfActiveConsumers();
+    drawingChannel.sendMessageObjectToConsumers({
+      type: 'producer_status_change',
+      status: 'open'
+    });
 
     ws.on('close', () => {
       map.get(ws.drawingId).clearEvents();
       drawingChannel.sendMessageObjectToConsumers({ type: 'clear' });
+      drawingChannel.sendMessageObjectToConsumers({
+        type: 'producer_status_change',
+        status: 'closed'
+      });
     });
 
     ws.on('message', (msg) => {
@@ -24,8 +33,12 @@ module.exports = (map) => {
   });
 
   watchWss.on('connection', (ws) => {
-    // TODO show connection to drawer.
-    // TODO show message to watcher.
+    map.get(ws.drawingId).alertProducerOfActiveConsumers();
+
+    ws.on('close', () => {
+      map.get(ws.drawingId).alertProducerOfActiveConsumers();
+    });
+
     ws.send(JSON.stringify({
       type: 'sync',
       events: map.get(ws.drawingId).getEvents()

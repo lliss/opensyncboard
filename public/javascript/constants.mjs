@@ -5,6 +5,7 @@ const DRAW_EVENT_TYPE_CIRCLE = 'circle';
 const DRAW_EVENT_TYPE_CLEAR = 'clear';
 const DRAW_EVENT_TYPE_SEGMENT = 'segment';
 const DRAW_EVENT_TYPE_SYNC = 'sync';
+const PRODUCER_EVENT_STATUS_CHANGE = 'producer_status_change';
 const RATIO_HEIGHT = 9;
 const RATIO_WIDTH = 16;
 const SOCKET_DRAW_BASE_URL = `ws://localhost:3000/socket/draw`;
@@ -18,6 +19,7 @@ export default {
   DRAW_EVENT_TYPE_SEGMENT,
   DRAW_EVENT_TYPE_SYNC,
   PADDING_PERCENT,
+  PRODUCER_EVENT_STATUS_CHANGE,
   RATIO_HEIGHT,
   RATIO_WIDTH,
   SOCKET_DRAW_BASE_URL,
