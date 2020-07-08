@@ -1,14 +1,14 @@
 import constants from './constants.mjs';
+import DrawingSurface from './DrawingSurface.mjs';
 import * as drawHelpers from './drawHelpers.mjs';
 
-let canvas = null;
-let ctx = null;
+let surface = null;
 let events = [];
 const socket = new WebSocket(`${constants.SOCKET_VIEW_BASE_URL}/${drawingId}`);
 
 function main() {
-  ({ctx, canvas} = drawHelpers.initializeCanvas());
-  drawHelpers.resetCanvasSize(canvas);
+  surface = new DrawingSurface('#syncboard', '2d');
+  surface.resetCanvasSize();
   attachEventListeners();
 
   socket.addEventListener('close', function (evnt) {
@@ -41,34 +41,24 @@ function handleIncomingDrawEvent(drawEvent) {
   switch (drawEvent.type) {
     case constants.DRAW_EVENT_TYPE_SYNC:
       events = drawEvent.events;
-      drawHelpers.redraw(events, ctx, canvas);
-      break;
-
-    case constants.DRAW_EVENT_TYPE_SEGMENT:
-      drawHelpers.drawSegment(drawEvent.event, ctx, canvas);
-      events.push(drawEvent);
-      break;
-
-    case constants.DRAW_EVENT_TYPE_CIRCLE:
-      drawHelpers.drawCircle(drawEvent.event, ctx, canvas);
-      events.push(drawEvent);
+      drawHelpers.redraw(events, surface);
       break;
 
     case constants.DRAW_EVENT_TYPE_CLEAR:
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      surface.clear();
       events = [];
-      drawHelpers.redraw(events, ctx, canvas);
       break;
 
     default:
-      // Noop
+      drawHelpers.routeDrawEvent(drawEvent, surface);
+      events.push(drawEvent);
   }
 }
 
 function attachEventListeners() {
   window.addEventListener('resize', (evnt) => {
-    drawHelpers.resetCanvasSize(canvas);
-    drawHelpers.redraw(events, ctx, canvas);
+    surface.resetCanvasSize();
+    drawHelpers.redraw(events, surface);
   });
 }
 
