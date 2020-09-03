@@ -1,9 +1,22 @@
+html {
+  font-size: 2vw;
+}
+
 body {
   text-align: center;
 }
 
-button {
+button, .button {
   font-weight: bold;
+}
+
+
+
+#grid-container {
+  height: 90vh;
+  align-items: center;
+  justify-items: center;
+  display: grid;
 }
 
 #active-clients, #session-status {
