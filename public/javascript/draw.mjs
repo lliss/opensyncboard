@@ -47,12 +47,20 @@ function attachEventListeners() {
   canvas.addEventListener('touchmove', touchDraw);
 
   canvas.addEventListener('click', addCircle);
-  canvas.addEventListener('touchend', addCircle);
+  canvas.addEventListener('touchend', touchCircle);
 
   window.addEventListener('resize', (_) => {
     surface.resetCanvasSize();
     drawHelpers.redraw(events, surface);
   });
+}
+
+function normalizeTouchEvent(evnt) {
+  let e = {};
+  e.target = evnt.target;
+  e.pageX = evnt.pageX || evnt.touches[0].pageX;
+  e.pageY = evnt.pageY || evnt.touches[0].pageY;
+  return e;
 }
 
 function startDrawing(evnt) {
@@ -62,10 +70,7 @@ function startDrawing(evnt) {
 
 function startTouchDrawing(evnt) {
   evnt.preventDefault();
-  let e = {};
-  e.target = evnt.target;
-  e.pageX = evnt.pageX || evnt.touches[0].pageX;
-  e.pageY = evnt.pageY || evnt.touches[0].pageY;
+  let e = normalizeTouchEvent(evnt);
   startDrawing(e);
 }
 
@@ -103,11 +108,13 @@ function draw(evnt) {
 
 function touchDraw(evnt) {
   evnt.preventDefault();
-  let e = {};
-  e.target = evnt.target;
-  e.pageX = evnt.pageX || evnt.touches[0].pageX;
-  e.pageY = evnt.pageY || evnt.touches[0].pageY;
+  let e = normalizeTouchEvent(evnt);
   draw(e);
+}
+
+function touchCircle(evnt) {
+  let e = normalizeTouchEvent(evnt);
+  addCircle(e);
 }
 
 function addCircle(evnt) {
