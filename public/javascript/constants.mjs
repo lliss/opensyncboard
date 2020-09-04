@@ -8,8 +8,10 @@ const DRAW_EVENT_TYPE_SYNC = 'sync';
 const PRODUCER_EVENT_STATUS_CHANGE = 'producer_status_change';
 const RATIO_HEIGHT = 9;
 const RATIO_WIDTH = 16;
-const SOCKET_DRAW_BASE_URL = `ws://localhost:3000/socket/draw`;
-const SOCKET_VIEW_BASE_URL = `ws://localhost:3000/socket/view/`;
+const HOSTNAME = window.location.hostname;
+const PROTOCOL = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const SOCKET_DRAW_BASE_URL = `${PROTOCOL}://${HOSTNAME}/socket/draw`;
+const SOCKET_VIEW_BASE_URL = `${PROTOCOL}://${HOSTNAME}/socket/view/`;
 
 export default {
   DEFAULT_LINE_COLOR,
