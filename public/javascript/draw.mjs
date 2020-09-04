@@ -113,7 +113,10 @@ function touchDraw(evnt) {
 }
 
 function touchCircle(evnt) {
-  let e = normalizeTouchEvent(evnt);
+  let e = {};
+  e.target = evnt.target;
+  e.pageX = evnt.pageX || evnt.changedTouches[0].pageX;
+  e.pageY = evnt.pageY || evnt.changedTouches[0].pageY;
   addCircle(e);
 }
 
