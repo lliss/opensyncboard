@@ -1,16 +1,16 @@
+
 html {
-  font-size: 2vw;
+  font-size: 1.8vw;
 }
 
 body {
   text-align: center;
+  padding-top: 3%;
 }
 
 button, .button {
   font-weight: bold;
 }
-
-
 
 #grid-container {
   height: 90vh;
@@ -91,4 +91,20 @@ canvas {
 
 .color-control.active, .size-control.active {
   background-color: silver;
+}
+
+#copy {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#drawing-id {
+  font-family: monospace;
+}
+
+#copy-button {
+  background-color: white;
 }

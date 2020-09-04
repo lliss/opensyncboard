@@ -9,9 +9,10 @@ const PRODUCER_EVENT_STATUS_CHANGE = 'producer_status_change';
 const RATIO_HEIGHT = 9;
 const RATIO_WIDTH = 16;
 const HOSTNAME = window.location.hostname;
-const PROTOCOL = window.location.protocol === 'https:' ? 'wss' : 'ws';
-const SOCKET_DRAW_BASE_URL = `${PROTOCOL}://${HOSTNAME}/socket/draw`;
-const SOCKET_VIEW_BASE_URL = `${PROTOCOL}://${HOSTNAME}/socket/view/`;
+const PROTOCOL = window.location.protocol;
+const SOCKET_PROTOCOL = PROTOCOL === 'https:' ? 'wss' : 'ws';
+const SOCKET_DRAW_BASE_URL = `${SOCKET_PROTOCOL}://${HOSTNAME}/socket/draw`;
+const SOCKET_VIEW_BASE_URL = `${SOCKET_PROTOCOL}://${HOSTNAME}/socket/view/`;
 
 export default {
   DEFAULT_LINE_COLOR,
@@ -20,8 +21,10 @@ export default {
   DRAW_EVENT_TYPE_CLEAR,
   DRAW_EVENT_TYPE_SEGMENT,
   DRAW_EVENT_TYPE_SYNC,
+  HOSTNAME,
   PADDING_PERCENT,
   PRODUCER_EVENT_STATUS_CHANGE,
+  PROTOCOL,
   RATIO_HEIGHT,
   RATIO_WIDTH,
   SOCKET_DRAW_BASE_URL,

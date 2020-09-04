@@ -12,8 +12,6 @@ let events = [];
 const socket = new WebSocket(`${constants.SOCKET_DRAW_BASE_URL}/${drawingId}`);
 
 function main() {
-  document.body.style.padding = `${constants.PADDING_PERCENT}vh ${constants.PADDING_PERCENT}vw`;
-
   socket.addEventListener('open', () => {
     surface = new DrawingSurface('#syncboard', '2d');
     surface.resetCanvasSize();
@@ -53,6 +51,33 @@ function attachEventListeners() {
     surface.resetCanvasSize();
     drawHelpers.redraw(events, surface);
   });
+
+  let copyButton = document.querySelector('#copy-button');
+  copyButton.addEventListener('click', copyLinkToClipboard);
+  copyButton.addEventListener('touchend', copyLinkToClipboard);
+
+}
+
+function clipBoardCopyFallback() {
+  document.querySelector('#copy-button').style.display = 'none';
+  let text = document.createTextNode('  <= COPY THIS CODE');
+  document.querySelector('#copy').appendChild(text);
+}
+
+function copyLinkToClipboard() {
+  const id = document.querySelector('#drawing-id').textContent;
+  try {
+    navigator.clipboard.writeText(`${constants.PROTOCOL}//${constants.HOSTNAME}/view/${id}`)
+      .then(() => {
+        alert('The link was copied to your clipboard.')
+      })
+      .catch((_) => {
+        alert('Whoops! We could not copy to your clipboard');
+        clipBoardCopyFallback();
+      });
+  } catch {
+    clipBoardCopyFallback();
+  }
 }
 
 function normalizeTouchEvent(evnt) {

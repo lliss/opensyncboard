@@ -9,7 +9,7 @@ class DrawingSurface {
     this.lineWidth = constants.DEFAULT_LINE_WIDTH;
     this.lineColor = constants.DEFAULT_LINE_COLOR;
 
-    document.body.style.padding = `${constants.PADDING_PERCENT}vh ${constants.PADDING_PERCENT}vw`;
+    document.body.style.padding = `${constants.PADDING_PERCENT}vh ${constants.PADDING_PERCENT}vw 0`;
     this.ctx.lineWidth = this.calculateActualLineWidth(constants.DEFAULT_LINE_WIDTH);
     this.ctx.lineCap = 'round';
     this.ctx.lineJoin = 'round';
