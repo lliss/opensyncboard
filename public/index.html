@@ -1,8 +1,10 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   <title>Open Syncboard</title>
-  <link rel="stylesheet" href="stylesheets/skeleton.css" />
+  <link rel="stylesheet" href="stylesheets/skeleton.css">
+  <link rel="stylesheet" href="stylesheets/media-queries.css">
   <link rel="stylesheet" href="stylesheets/styles.css">
 
 </head>
@@ -11,16 +13,19 @@
   <div id="grid-container">
     <div class="grid-element">
       <h1>Open Syncboard</h1>
-      <a href="/new" class="button button-primary">Start New</a>
-      <p>or...</p>
-      <input type="text" id="code" placeholder="syncboard code">
-      <button class=button-primary id="join">Join</button>
+      <p>a synchronized whiteboard</p>
+      <div><a href="/new" class="button button-primary">Start new sync</a></div>
+      <div>or...</div>
+      <div>
+        <input type="text" id="code" placeholder="enter code">
+        <button class=button-primary id="join">Join a sync</button>
+      </div>
     </div>
   </div>
   <script>
     document.querySelector('#join').addEventListener('click', () => {
       const validChars = 'abcdef0123456789'.split('');
-      const code = document.querySelector('#code').value.toLowerCase();
+      const code = document.querySelector('#code').value.trim().toLowerCase();
 
       let valid = code.split('')
         .map(item => validChars.includes(item))
