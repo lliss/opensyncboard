@@ -1,9 +1,40 @@
-body {
-  text-align: center;
+
+html {
+  font-size: 1.8vw;
 }
 
-button {
+body {
+  text-align: center;
+  padding-top: 3%;
+}
+
+button, .button {
   font-weight: bold;
+}
+
+#grid-container {
+  height: 90vh;
+  align-items: center;
+  justify-items: center;
+  display: grid;
+}
+
+#active-clients, #session-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: black;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 1s ease;
+}
+
+#session-status .inactive {
+  color: red;
+}
+
+#session-status .active {
+  color: green;
 }
 
 canvas {
@@ -60,4 +91,20 @@ canvas {
 
 .color-control.active, .size-control.active {
   background-color: silver;
+}
+
+#copy {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#drawing-id {
+  font-family: monospace;
+}
+
+#copy-button {
+  background-color: white;
 }

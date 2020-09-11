@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <title>Syncborad Draw</title>
-  <link rel="stylesheet" href="/stylesheets/skeleton.css" />
+  <meta charset="utf-8">
+  <title>Syncboard Draw</title>
+  <link rel="stylesheet" href="/stylesheets/skeleton.css">
   <link rel="stylesheet" href="/stylesheets/styles.css">
   <script>
     var key = '{{ key }}';
@@ -14,6 +14,8 @@
 </head>
 
 <body>
+  <div id="copy"><button id="copy-button">Share Session</button> <span id="drawing-id">{{ drawingId }}</span></div>
+  <div id="active-clients"><p></p></div>
   <div id="canvas-container">
     <canvas id="syncboard" width="800" height="450"></canvas>
   </div>
@@ -36,7 +38,7 @@
         <div class="size-control" data-size="5"></div>
       </div>
       <div id="canvas-controls">
-        <div class="canvas-control">
+        <div>
           <button id="clear-button" class="button-primary">CLEAR</button>
         </div>
       </div>

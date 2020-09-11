@@ -9,20 +9,40 @@ module.exports = (map) => {
   watchWss.type = 'consumer';
 
   drawWss.on('connection', function connection(ws) {
-    ws.on('message', function(msg) {
-      console.log('draw', msg, ws.drawingId);
-      map.get(ws.drawingId).consumers.forEach((consumerWs) => {
-        if (consumerWs.readyState === WebSocket.OPEN) {
-          consumerWs.send(msg);
-        }
+    const drawingChannel = map.get(ws.drawingId);
+    map.get(ws.drawingId).alertProducerOfActiveConsumers();
+    drawingChannel.sendMessageObjectToConsumers({
+      type: 'producer_status_change',
+      status: 'open'
+    });
+
+    ws.on('close', () => {
+      map.get(ws.drawingId).clearEvents();
+      drawingChannel.sendMessageObjectToConsumers({ type: 'clear' });
+      drawingChannel.sendMessageObjectToConsumers({
+        type: 'producer_status_change',
+        status: 'closed'
       });
+    });
+
+    ws.on('message', (msg) => {
+      const msgObject = JSON.parse(msg);
+      drawingChannel.addEvent(msgObject);
+      drawingChannel.sendMessageObjectToConsumers(msgObject);
     });
   });
 
-  watchWss.on('connection', function connection(ws) {
-    ws.on('message', function(msg) {
-      console.log(msg);
+  watchWss.on('connection', (ws) => {
+    map.get(ws.drawingId).alertProducerOfActiveConsumers();
+
+    ws.on('close', () => {
+      map.get(ws.drawingId).alertProducerOfActiveConsumers();
     });
+
+    ws.send(JSON.stringify({
+      type: 'sync',
+      events: map.get(ws.drawingId).getEvents()
+    }));
   });
 
   let socketServers = {};
