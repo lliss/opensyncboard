@@ -21,11 +21,11 @@
     "test": "jest"
   },
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "express": "~4.16.1",
-    "morgan": "~1.9.1",
-    "nunjucks": "^3.2.1",
-    "uuid": "^8.1.0",
-    "ws": "^7.3.0"
+    "cookie-parser": "^1.4.6",
+    "express": "^4.17.2",
+    "morgan": "^1.10.0",
+    "nunjucks": "^3.2.3",
+    "uuid": "^8.3.2",
+    "ws": "^8.4.2"
   }
 }
