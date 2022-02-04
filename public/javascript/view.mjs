@@ -14,14 +14,17 @@ function main() {
 
   socket.addEventListener('close', function (evnt) {
     console.log('CLOSE');
+    setInactiveConnectionMessage();
   });
 
   socket.addEventListener('error', function (evnt) {
     console.log('ERROR');
+    setInactiveConnectionMessage();
   });
 
   socket.addEventListener('open', function (evnt) {
     console.log('CONNECTED');
+    setActiveConnectionMessage();
   });
 
   socket.addEventListener('message', function (evnt) {
@@ -36,6 +39,20 @@ function main() {
       handleIncomingEvent(eventData);
     }
   });
+}
+
+function setActiveConnectionMessage() {
+  const el = document.querySelector('#session-status p');
+  el.textContent = 'active connection';
+  el.classList.add('active');
+  el.classList.remove('inactive');
+}
+
+function setInactiveConnectionMessage() {
+  let el = document.querySelector('#session-status p');
+  el.textContent = 'inactive connection';
+  el.classList.add('inactive');
+  el.classList.remove('active');
 }
 
 function handleIncomingEvent(eventData) {
@@ -63,17 +80,11 @@ function handleIncomingEvent(eventData) {
 function updateSessionConnectionMessage(sessionStatusMessage) {
   if (sessionStatusMessage.status === 'closed') {
     statusChangeTimer = setTimeout(() => {
-      let el = document.querySelector('#session-status p');
-      el.textContent = 'inactive connection';
-      el.classList.add('inactive');
-      el.classList.remove('active');
-      }, 3000)
+      setInactiveConnectionMessage();
+    }, 3000)
   } else {
     clearTimeout(statusChangeTimer);
-    let el = document.querySelector('#session-status p');
-    el.textContent = 'active connection';
-    el.classList.add('active');
-    el.classList.remove('inactive');
+    setActiveConnectionMessage();
   }
 }
 

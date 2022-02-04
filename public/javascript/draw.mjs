@@ -13,6 +13,7 @@ const socket = new WebSocket(`${constants.SOCKET_DRAW_BASE_URL}/${drawingId}`);
 
 function main() {
   socket.addEventListener('open', () => {
+    console.log('CONNECTED');
     surface = new DrawingSurface('#syncboard', '2d');
     surface.resetCanvasSize();
     setupControls();
@@ -27,6 +28,14 @@ function main() {
       console.error(`Error: ${e.message}`);
       console.error(`Data: ${evnt.data}`);
     }
+  });
+
+  socket.addEventListener('close', function (evnt) {
+    console.log('CLOSE');
+  });
+
+  socket.addEventListener('error', function (evnt) {
+    console.log('ERROR');
   });
 
 }
