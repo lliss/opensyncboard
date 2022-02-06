@@ -9,6 +9,7 @@ let lastPosition = null;
 let lineWidth = constants.DEFAULT_LINE_WIDTH;
 let lineColor = constants.DEFAULT_LINE_COLOR;
 let events = [];
+let heartbeatInterval;
 const socket = new WebSocket(`${constants.SOCKET_DRAW_BASE_URL}/${drawingId}`);
 
 function main() {
@@ -18,6 +19,7 @@ function main() {
     surface.resetCanvasSize();
     setupControls();
     attachEventListeners();
+    startHeartbeat();
   });
 
   socket.addEventListener('message', function (evnt) {
@@ -32,6 +34,7 @@ function main() {
 
   socket.addEventListener('close', function (evnt) {
     console.log('CLOSE');
+    clearInterval(heartbeatInterval);
   });
 
   socket.addEventListener('error', function (evnt) {
@@ -244,6 +247,12 @@ function deactivateToggles(selector) {
   document.querySelectorAll(selector).forEach((el) => {
     el.classList.remove('active');
   });
+}
+
+function startHeartbeat() {
+  heartbeatInterval = setInterval(() => {
+    socket.send(JSON.stringify({ type: constants.EVENT_TYPE_HEARBEAT }));
+  }, constants.HEARTBEAT_INTERVAL);
 }
 
 main();

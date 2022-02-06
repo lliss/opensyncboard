@@ -5,6 +5,7 @@ import * as drawHelpers from './drawHelpers.mjs';
 let surface = null;
 let events = [];
 let statusChangeTimer = null;
+let heartbeatInterval;
 const socket = new WebSocket(`${constants.SOCKET_VIEW_BASE_URL}/${drawingId}`);
 
 function main() {
@@ -15,6 +16,7 @@ function main() {
   socket.addEventListener('close', function (evnt) {
     console.log('CLOSE');
     setInactiveConnectionMessage();
+    clearInterval(heartbeatInterval);
   });
 
   socket.addEventListener('error', function (evnt) {
@@ -25,6 +27,7 @@ function main() {
   socket.addEventListener('open', function (evnt) {
     console.log('CONNECTED');
     setActiveConnectionMessage();
+    startHeartbeat();
   });
 
   socket.addEventListener('message', function (evnt) {
@@ -93,6 +96,12 @@ function attachEventListeners() {
     surface.resetCanvasSize();
     drawHelpers.redraw(events, surface);
   });
+}
+
+function startHeartbeat() {
+  heartbeatInterval = setInterval(() => {
+    socket.send(JSON.stringify({ type: constants.EVENT_TYPE_HEARBEAT }));
+  }, constants.HEARTBEAT_INTERVAL);
 }
 
 main();
