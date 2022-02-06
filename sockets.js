@@ -35,6 +35,7 @@ module.exports = (map) => {
     });
 
     ws.on('close', () => {
+      ws.isAlive = false;
       map.get(ws.drawingId).clearEvents();
       drawingChannel.sendMessageObjectToConsumers({ type: 'clear' });
       drawingChannel.sendMessageObjectToConsumers({
@@ -45,6 +46,11 @@ module.exports = (map) => {
 
     ws.on('message', (msg) => {
       const msgObject = JSON.parse(msg);
+
+      if (msgObject.type === 'heartbeat') {
+        return;
+      }
+
       drawingChannel.addEvent(msgObject);
       drawingChannel.sendMessageObjectToConsumers(msgObject);
     });
@@ -58,6 +64,7 @@ module.exports = (map) => {
     drawer.alertProducerOfActiveConsumers();
 
     ws.on('close', () => {
+      ws.isAlive = false;
       drawer.alertProducerOfActiveConsumers();
       drawer.cleanupConsumer(ws);
     });

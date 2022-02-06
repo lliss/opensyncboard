@@ -6,6 +6,15 @@ class DrawingChannel {
     this.producer = null;
     this.consumers = [];
     this.events = [];
+    this.lastMessageTime = Date.now();
+  }
+
+  hasLivingSocket() {
+    return this.producer !== null && this.producer.isAlive;
+  }
+
+  getLastMessageTime() {
+    return this.lastMessageTime;
   }
 
   setProducer(ws) {
@@ -17,6 +26,7 @@ class DrawingChannel {
   }
 
   addEvent(evnt) {
+    this.lastMessageTime = Date.now();
     if (evnt.type === 'clear') {
       this.clearEvents();
     } else {
@@ -42,10 +52,6 @@ class DrawingChannel {
   }
 
   sendMessageObjectToConsumers(msgObject) {
-    if (msgObject.type === 'heartbeat') {
-      return;
-    }
-
     this.getConsumers().forEach((consumerWs) => {
       if (consumerWs.readyState === WebSocket.OPEN) {
         consumerWs.send(JSON.stringify(msgObject));
