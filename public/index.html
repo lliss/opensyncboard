@@ -17,13 +17,16 @@
       <div><a href="/new" class="button button-primary">Start new sync</a></div>
       <div>or...</div>
       <div>
-        <input type="text" id="code" placeholder="enter code">
-        <button class=button-primary id="join">Join a sync</button>
+        <form id="join-form">
+          <input type="text" id="code" placeholder="enter code">
+          <input type="submit" class=button-primary id="join" value="Join a sync">
+        </form>
       </div>
     </div>
   </div>
   <script>
-    document.querySelector('#join').addEventListener('click', () => {
+    document.querySelector('#join-form').addEventListener('submit', (evnt) => {
+      evnt.preventDefault();
       const validChars = 'abcdef0123456789'.split('');
       const code = document.querySelector('#code').value.trim().toLowerCase();
 
