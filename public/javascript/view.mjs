@@ -5,6 +5,7 @@ import * as drawHelpers from './drawHelpers.mjs';
 let surface = null;
 let events = [];
 let statusChangeTimer = null;
+let heartbeatInterval;
 const socket = new WebSocket(`${constants.SOCKET_VIEW_BASE_URL}/${drawingId}`);
 
 function main() {
@@ -14,14 +15,19 @@ function main() {
 
   socket.addEventListener('close', function (evnt) {
     console.log('CLOSE');
+    setInactiveConnectionMessage();
+    clearInterval(heartbeatInterval);
   });
 
   socket.addEventListener('error', function (evnt) {
     console.log('ERROR');
+    setInactiveConnectionMessage();
   });
 
   socket.addEventListener('open', function (evnt) {
     console.log('CONNECTED');
+    setActiveConnectionMessage();
+    startHeartbeat();
   });
 
   socket.addEventListener('message', function (evnt) {
@@ -36,6 +42,20 @@ function main() {
       handleIncomingEvent(eventData);
     }
   });
+}
+
+function setActiveConnectionMessage() {
+  const el = document.querySelector('#session-status p');
+  el.textContent = 'active connection';
+  el.classList.add('active');
+  el.classList.remove('inactive');
+}
+
+function setInactiveConnectionMessage() {
+  let el = document.querySelector('#session-status p');
+  el.textContent = 'inactive connection';
+  el.classList.add('inactive');
+  el.classList.remove('active');
 }
 
 function handleIncomingEvent(eventData) {
@@ -63,17 +83,11 @@ function handleIncomingEvent(eventData) {
 function updateSessionConnectionMessage(sessionStatusMessage) {
   if (sessionStatusMessage.status === 'closed') {
     statusChangeTimer = setTimeout(() => {
-      let el = document.querySelector('#session-status p');
-      el.textContent = 'inactive connection';
-      el.classList.add('inactive');
-      el.classList.remove('active');
-      }, 3000)
+      setInactiveConnectionMessage();
+    }, 3000)
   } else {
     clearTimeout(statusChangeTimer);
-    let el = document.querySelector('#session-status p');
-    el.textContent = 'active connection';
-    el.classList.add('active');
-    el.classList.remove('inactive');
+    setActiveConnectionMessage();
   }
 }
 
@@ -82,6 +96,12 @@ function attachEventListeners() {
     surface.resetCanvasSize();
     drawHelpers.redraw(events, surface);
   });
+}
+
+function startHeartbeat() {
+  heartbeatInterval = setInterval(() => {
+    socket.send(JSON.stringify({ type: constants.EVENT_TYPE_HEARBEAT }));
+  }, constants.HEARTBEAT_INTERVAL);
 }
 
 main();

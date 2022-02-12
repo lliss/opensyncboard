@@ -9,14 +9,17 @@ let lastPosition = null;
 let lineWidth = constants.DEFAULT_LINE_WIDTH;
 let lineColor = constants.DEFAULT_LINE_COLOR;
 let events = [];
+let heartbeatInterval;
 const socket = new WebSocket(`${constants.SOCKET_DRAW_BASE_URL}/${drawingId}`);
 
 function main() {
   socket.addEventListener('open', () => {
+    console.log('CONNECTED');
     surface = new DrawingSurface('#syncboard', '2d');
     surface.resetCanvasSize();
     setupControls();
     attachEventListeners();
+    startHeartbeat();
   });
 
   socket.addEventListener('message', function (evnt) {
@@ -27,6 +30,15 @@ function main() {
       console.error(`Error: ${e.message}`);
       console.error(`Data: ${evnt.data}`);
     }
+  });
+
+  socket.addEventListener('close', function (evnt) {
+    console.log('CLOSE');
+    clearInterval(heartbeatInterval);
+  });
+
+  socket.addEventListener('error', function (evnt) {
+    console.log('ERROR');
   });
 
 }
@@ -235,6 +247,12 @@ function deactivateToggles(selector) {
   document.querySelectorAll(selector).forEach((el) => {
     el.classList.remove('active');
   });
+}
+
+function startHeartbeat() {
+  heartbeatInterval = setInterval(() => {
+    socket.send(JSON.stringify({ type: constants.EVENT_TYPE_HEARBEAT }));
+  }, constants.HEARTBEAT_INTERVAL);
 }
 
 main();

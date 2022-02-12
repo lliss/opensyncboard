@@ -52,6 +52,17 @@ function setupServer() {
   server.on('upgrade', serverFunctions.prepareUpgrade(socketServers, drawingsMap, cp));
 }
 
+function cleanupOldDrawingChannels() {
+  console.log(`MAP has ${drawingsMap.size} items BEFORE cleanup.`);
+  for (let entry of drawingsMap.entries()) {
+    const channel = entry[1];
+    if (Date.now() - channel.getLastMessageTime() > constants.ONE_DAY_IN_MS && !channel.hasLivingSocket()) {
+      drawingsMap.delete(entry[0]);
+    }
+  }
+  console.log(`MAP has ${drawingsMap.size} items AFTER cleanup.`);
+}
+
 function main() {
   setupExpress();
   setupServer();
@@ -60,6 +71,8 @@ function main() {
     autoescape: true,
     express: app
   });
+
+  setInterval(cleanupOldDrawingChannels, constants.ONE_DAY_IN_MS);
 }
 
 main();

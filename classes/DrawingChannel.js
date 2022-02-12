@@ -6,6 +6,15 @@ class DrawingChannel {
     this.producer = null;
     this.consumers = [];
     this.events = [];
+    this.lastMessageTime = Date.now();
+  }
+
+  hasLivingSocket() {
+    return this.producer !== null && this.producer.isAlive;
+  }
+
+  getLastMessageTime() {
+    return this.lastMessageTime;
   }
 
   setProducer(ws) {
@@ -17,6 +26,7 @@ class DrawingChannel {
   }
 
   addEvent(evnt) {
+    this.lastMessageTime = Date.now();
     if (evnt.type === 'clear') {
       this.clearEvents();
     } else {
@@ -54,6 +64,15 @@ class DrawingChannel {
                   .filter(consumerWs => consumerWs.readyState === WebSocket.OPEN)
                   .length;
     this.getProducer().send(JSON.stringify({ count }));
+  }
+
+  cleanupConsumer(ws) {
+    const index = this.consumers.indexOf(ws);
+    // Fastest way to delete an item... swap it to the end of the array... then pop.
+    if (index !== -1) {
+      this.consumers[index] = this.consumers[this.consumers.length - 1];
+      this.consumers.pop();
+    }
   }
 
 }
